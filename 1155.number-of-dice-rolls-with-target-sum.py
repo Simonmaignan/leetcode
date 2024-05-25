@@ -13,10 +13,9 @@ class Solution:
         dp[0][0] = 1
 
         for dice in range(n):
-            for value in range(target):
-                for dice_throw in range(1, k + 1):
-                    if value + 1 - dice_throw >= 0:
-                        dp[dice + 1][value + 1] += dp[dice][value + 1 - dice_throw]
+            for value in range(1, target + 1):
+                for dice_throw in range(1, min(k, value) + 1):
+                    dp[dice + 1][value] += dp[dice][value - dice_throw]
 
         return dp[-1][-1] % (10**9 + 7)
 
