@@ -13,13 +13,15 @@ class Solution:
     ) -> int:
         n_crimes = len(group)
         sum_profit = sum(profit)
-        dp: List[List[int]] = [[-1] * (n + 1) for _ in range(sum_profit + 1)]
+        dp: List[List[int]] = [
+            [[-1] * (n + 1) for _ in range(sum_profit + 1)] for _ in range(n_crimes + 1)
+        ]
 
         def dfs(start_i: int, cur_profit: int, nb_members: int) -> int:
             if nb_members > n:
                 return 0
-            if dp[cur_profit][nb_members] >= 0:
-                return dp[cur_profit][nb_members]
+            if dp[start_i][cur_profit][nb_members] >= 0:
+                return dp[start_i][cur_profit][nb_members]
 
             nb_profitable_crimes = 0
             if cur_profit >= minProfit:
@@ -29,7 +31,7 @@ class Solution:
                     i + 1, cur_profit + profit[i], nb_members + group[i]
                 )
 
-            dp[cur_profit][nb_members] = nb_profitable_crimes
+            dp[start_i][cur_profit][nb_members] = nb_profitable_crimes
             return nb_profitable_crimes
 
         return dfs(0, 0, 0) % (10**9 + 7)
