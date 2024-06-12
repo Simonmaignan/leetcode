@@ -10,28 +10,21 @@ from typing import List
 class Solution:
     def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:
         n = len(gas)
-        # pref_diff = [0]
-        # ans = (-1, -1)
-        # for i in range(n):
-        #     pref_diff[i + 1] = pref_diff[i] + gas[i] - cost[i]
-        #     if pref_diff[i + 1] > ans[1]:
-        #         ans = (i, pref_diff[i + 1])
-        # return ans[0]
-        diff = [gas[i] - cost[i] for i in range(n)]
-        for i in range(n):
-            # print(f"i={i}")
-            tank = diff[i]
-            j = (i + 1) % n
-            # print(f"j={j}")
+        start = end = n - 1
+        visited_station = 0
+        tank = 0
+        while visited_station < n:
+            tank += gas[end] - cost[end]
+            end = (end + 1) % n
+            visited_station += 1
+            # print(f"start={start}")
+            # print(f"end={end}")
             # print(f"tank={tank}")
-            while j != i and tank >= 0:
-                # print(f"j={j}")
-                # print(f"tank={tank}")
-                tank += diff[j]
-                j = (j + 1) % n
-            if tank >= 0:
-                return i
-        return -1
+            while tank < 0 and visited_station < n:
+                start = (start - 1) % n
+                tank += gas[start] - cost[start]
+                visited_station += 1
+        return start if tank >= 0 else -1
 
 
 # @lc code=end
