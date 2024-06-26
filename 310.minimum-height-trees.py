@@ -3,50 +3,40 @@
 #
 # [310] Minimum Height Trees
 #
-from typing import List, Optional, Set, Tuple
+from typing import Dict, List
+from collections import defaultdict, deque
 
 
 # @lc code=start
-class Node:
-    def __init__(self, value: int, children: Optional[List["Node"]] = None) -> None:
-        self.value = value
-        if children is None:
-            children = []
-        self.children = children
-
-
 class Solution:
     def findMinHeightTrees(self, n: int, edges: List[List[int]]) -> List[int]:
-        def compute_tree_height(root: int) -> int:
-            nodes_created: Set[int] = set([root])
+        if n == 1:
+            return [0]
+        node_relations: Dict[int, List[int]] = defaultdict(list)
+        nodes_indegree: List[int] = [0] * n
+        for node1, node2 in edges:
+            node_relations[node1].append(node2)
+            nodes_indegree[node1] += 1
+            node_relations[node2].append(node1)
+            nodes_indegree[node2] += 1
 
-            def dfs(node: int) -> int:
-                # print(f"node {node}")
-                max_height = 0
-                for node1, node2 in edges:
-                    if node1 == node and node2 not in nodes_created:
-                        nodes_created.add(node2)
-                        max_height = max(max_height, dfs(node2) + 1)
-                    elif node2 == node and node1 not in nodes_created:
-                        nodes_created.add(node1)
-                        max_height = max(max_height, dfs(node1) + 1)
-                # print(f"node {node}; max_height={max_height}")
+        nodes_layer: deque[int] = deque()
+        for node, node_indegree in enumerate(nodes_indegree):
+            if node_indegree == 1:
+                nodes_layer.append(node)
 
-                return max_height
+        ans: List[int] = []
+        while nodes_layer:
+            ans.clear()
+            for _ in range(len(nodes_layer)):
+                cur_node = nodes_layer.popleft()
+                ans.append(cur_node)
+                for connected_node in node_relations[cur_node]:
+                    nodes_indegree[connected_node] -= 1
+                    if nodes_indegree[connected_node] == 1:
+                        nodes_layer.append(connected_node)
 
-            return dfs(root)
-
-        min_height_trees: Tuple[int, List[int]] = (n + 1, [])
-        for root in range(n):
-            tree_height = compute_tree_height(root)
-            # print(f"root {root} tree height = {tree_height}")
-            if tree_height < min_height_trees[0]:
-                min_height_trees = (tree_height, [root])
-            elif tree_height == min_height_trees[0]:
-                min_height_trees[1].append(root)
-
-        # print(min_height_trees)
-        return min_height_trees[1]
+        return ans
 
 
 # @lc code=end
