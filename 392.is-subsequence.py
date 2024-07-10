@@ -13,12 +13,10 @@ class Solution:
         n_t = len(t)
         while p_s < n_s and p_t < n_t:
             # print(f"s[{p_s}]={s[p_s]} - t[{p_t}]={t[p_t]}")
-            while p_t < n_t and s[p_s] != t[p_t]:
+            if s[p_s] == t[p_t]:
                 # print(f"s[{p_s}]={s[p_s]} - t[{p_t}]={t[p_t]}")
-                p_t += 1
-            if p_t < n_t:
                 p_s += 1
-                p_t += 1
+            p_t += 1
 
         return p_s == n_s
 
