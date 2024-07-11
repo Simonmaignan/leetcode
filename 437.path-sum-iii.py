@@ -3,7 +3,8 @@
 #
 # [437] Path Sum III
 #
-from typing import List, Optional
+from typing import Dict, Optional
+from collections import defaultdict
 
 
 class TreeNode:
@@ -21,30 +22,26 @@ class TreeNode:
 #         self.left = left
 #         self.right = right
 class Solution:
-    def check_target_match(
-        self, sums_prefix: List[int], targetSum: int
-    ) -> None:
-        for i in range(len(sums_prefix) - 1):
-            if (sums_prefix[-1] - sums_prefix[i]) == targetSum:
-                self.target_sum_nb_matches += 1
-
-    def dfs(
-        self, root: Optional[TreeNode], sums_prefix: List[int], targetSum: int
-    ) -> None:
-        if root is None:
-            return
-        # print(f"Node {root.val}")
-        sums_prefix.append(sums_prefix[-1] + root.val)
-        self.check_target_match(sums_prefix, targetSum)
-        # print(target_sums_list)
-        self.dfs(root.left, sums_prefix, targetSum)
-        self.dfs(root.right, sums_prefix, targetSum)
-        sums_prefix.pop()
-
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
-        self.target_sum_nb_matches = 0
-        self.dfs(root, [0], targetSum)
-        return self.target_sum_nb_matches
+        def dfs(
+            root: Optional[TreeNode],
+            cur_sum: int,
+            sums_counter: Dict[int, int],
+        ) -> int:
+            if root is None:
+                return 0
+            target_sum_nb_matches = 0
+            cur_sum += root.val
+            target_sum_nb_matches += sums_counter[cur_sum - targetSum]
+            sums_counter[cur_sum] += 1
+            target_sum_nb_matches += dfs(root.left, cur_sum, sums_counter)
+            target_sum_nb_matches += dfs(root.right, cur_sum, sums_counter)
+            sums_counter[cur_sum] = max(0, sums_counter[cur_sum] - 1)
+            return target_sum_nb_matches
+
+        sums_counter: Dict[int, int] = defaultdict(int)
+        sums_counter[0] = 1
+        return dfs(root, 0, sums_counter)
 
 
 # @lc code=end
