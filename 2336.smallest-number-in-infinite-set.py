@@ -13,21 +13,19 @@ class SmallestInfiniteSet:
 
     def __init__(self):
         self.heap: List[int] = [1]
-        self.set: Set[int] = set([1])
+        self.popped_numbers: Set[int] = set()
 
     def popSmallest(self) -> int:
         smallest = heapq.heappop(self.heap)
-        self.set.remove(smallest)
+        self.popped_numbers.add(smallest)
         if not self.heap:
             self.heap.append(smallest + 1)
-            self.set.add(smallest + 1)
         return smallest
 
     def addBack(self, num: int) -> None:
-        largest = heapq.nlargest(1, self.heap)[0]
-        if num < largest and num not in self.set:
+        if num in self.popped_numbers:
             heapq.heappush(self.heap, num)
-            self.set.add(num)
+            self.popped_numbers.remove(num)
 
 
 # Your SmallestInfiniteSet object will be instantiated and called as such:
