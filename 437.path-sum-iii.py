@@ -21,39 +21,30 @@ class TreeNode:
 #         self.left = left
 #         self.right = right
 class Solution:
-    def add_to_list(
-        self,
-        target_sums_list: List[int],
-        to_add: int,
-        target: Optional[int] = None,
+    def check_target_match(
+        self, sums_prefix: List[int], targetSum: int
     ) -> None:
-        for i in range(len(target_sums_list)):
-            target_sums_list[i] += to_add
-            if target is not None and target_sums_list[i] == target:
-                # print(f"match")
-                self.target_sum_match += 1
+        for i in range(len(sums_prefix) - 1):
+            if (sums_prefix[-1] - sums_prefix[i]) == targetSum:
+                self.target_sum_nb_matches += 1
 
     def dfs(
-        self,
-        root: Optional[TreeNode],
-        target_sums_list: List[int],
-        targetSum: int,
+        self, root: Optional[TreeNode], sums_prefix: List[int], targetSum: int
     ) -> None:
         if root is None:
             return
         # print(f"Node {root.val}")
-        target_sums_list.append(0)
-        self.add_to_list(target_sums_list, root.val, target=targetSum)
+        sums_prefix.append(sums_prefix[-1] + root.val)
+        self.check_target_match(sums_prefix, targetSum)
         # print(target_sums_list)
-        self.dfs(root.left, target_sums_list, targetSum)
-        self.dfs(root.right, target_sums_list, targetSum)
-        target_sums_list.pop()
-        self.add_to_list(target_sums_list, -root.val)
+        self.dfs(root.left, sums_prefix, targetSum)
+        self.dfs(root.right, sums_prefix, targetSum)
+        sums_prefix.pop()
 
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
-        self.target_sum_match = 0
-        self.dfs(root, [], targetSum)
-        return self.target_sum_match
+        self.target_sum_nb_matches = 0
+        self.dfs(root, [0], targetSum)
+        return self.target_sum_nb_matches
 
 
 # @lc code=end
