@@ -12,7 +12,7 @@ class Solution:
     def nearestExit(self, maze: List[List[str]], entrance: List[int]) -> int:
         m, n = len(maze), len(maze[0])
 
-        def neighbors(cur_cord: Tuple[int, int]) -> Iterator[Tuple[int, int]]:
+        def neighbors(cur_coord: Tuple[int, int]) -> Iterator[Tuple[int, int]]:
             directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
             for direction in directions:
                 # new_cord: Tuple[int, int] = tuple(
