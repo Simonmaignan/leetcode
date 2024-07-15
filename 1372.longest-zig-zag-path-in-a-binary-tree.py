@@ -22,29 +22,24 @@ class TreeNode:
 #         self.right = right
 class Solution:
     def longestZigZag(self, root: Optional[TreeNode]) -> int:
+        self.longest_zig_zag = 0
+
         def maxZigZag(
-            node: Optional[TreeNode], left: bool, current_path: int
-        ) -> int:
+            node: Optional[TreeNode], left_steps: int, right_steps: int
+        ) -> None:
             if node is None:
-                return 0
-            # current_path += 1
-            print(f"node={node.val}; left={left}; current_path={current_path}")
-            new_path_right = maxZigZag(node.right, True, 0)
-            new_path_left = maxZigZag(node.left, False, 0)
-            print(f"node={node.val}; left={left}; current_path={current_path}")
-            print(f"new_path_right={new_path_right}")
-            print(f"new_path_left={new_path_left}")
-            if left:
-                current_path += new_path_left
-                current_path = max(current_path, new_path_right)
-            else:
-                current_path += new_path_right
-                current_path = max(current_path, new_path_left)
-            print(f"current_path={current_path+1}")
+                return
+            self.longest_zig_zag = max(
+                right_steps, left_steps, self.longest_zig_zag
+            )
+            # print(f"node={node.val}; left={left}; right={right}")
+            # Going left -> left path reset
+            maxZigZag(node.left, left_steps=right_steps + 1, right_steps=0)
+            # Going right -> right path reset
+            maxZigZag(node.right, left_steps=0, right_steps=left_steps + 1)
 
-            return current_path + 1
-
-        return max(maxZigZag(root, True, 0), maxZigZag(root, False, 0))
+        maxZigZag(root, 0, 0)
+        return self.longest_zig_zag
 
 
 # @lc code=end
