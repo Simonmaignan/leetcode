@@ -21,9 +21,9 @@ class Trie:
             node = node.children[char]
         node.end_of_word += 1
 
-    def _search_prefix(self, word: str) -> Optional["Trie"]:
+    def _search_prefix(self, prefix: str) -> Optional["Trie"]:
         node = self
-        for char in word:
+        for char in prefix:
             if char not in node.children:
                 return None
             node = node.children[char]
