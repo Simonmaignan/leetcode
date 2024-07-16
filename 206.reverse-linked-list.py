@@ -3,7 +3,7 @@
 #
 # [206] Reverse Linked List
 #
-from typing import List, Optional
+from typing import Optional
 
 
 class ListNode:
@@ -20,29 +20,14 @@ class ListNode:
 #         self.next = next
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        # if head is None:
-        #     return None
-        # if head.next is None:
-        #     return head
-        # new_node = self.reverseList(head.next)
-        # new_node.next = head
-        # return new_node
-        nodes_list: List[ListNode] = []
-        while head:
-            nodes_list.append(head)
-            head = head.next
-
-        if not nodes_list:
-            return None
-
-        reversed_list_first: ListNode = nodes_list.pop()
-        reversed_list: ListNode = reversed_list_first
-        while nodes_list:
-            reversed_list.next = nodes_list.pop()
-            reversed_list = reversed_list.next
-        reversed_list.next = None
-
-        return reversed_list_first
+        dummy_node = ListNode()
+        cur_node = head
+        while cur_node:
+            next_node = cur_node.next
+            cur_node.next = dummy_node.next
+            dummy_node.next = cur_node
+            cur_node = next_node
+        return dummy_node.next
 
 
 # @lc code=end
