@@ -3,28 +3,22 @@
 #
 # [2352] Equal Row and Column Pairs
 #
-from typing import List, Dict
-from collections import defaultdict
+from typing import List
 
 
 # @lc code=start
+import numpy as np
+
+
 class Solution:
     def equalPairs(self, grid: List[List[int]]) -> int:
-        n = len(grid)
-        col_dict: Dict[str, int] = defaultdict(int)
-        for c in range(n):
-            col_str = ""
-            for r in range(n):
-                col_str += f" {grid[r][c]}"
-            col_dict[col_str] += 1
+        np_grid = np.array(grid)
 
         nb_pairs = 0
-        for r in range(n):
-            row_str = ""
-            for c in range(n):
-                row_str += f" {grid[r][c]}"
-            if row_str in col_dict:
-                nb_pairs += col_dict[row_str]
+        for row in np_grid:
+            for col in np_grid.T:
+                if np.array_equal(row, col):
+                    nb_pairs += 1
 
         return nb_pairs
 
