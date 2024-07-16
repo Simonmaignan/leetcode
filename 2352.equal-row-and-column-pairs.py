@@ -3,23 +3,21 @@
 #
 # [2352] Equal Row and Column Pairs
 #
-from typing import List
+from typing import List, Tuple
+from collections import Counter
 
 
 # @lc code=start
-import numpy as np
-
-
 class Solution:
     def equalPairs(self, grid: List[List[int]]) -> int:
-        np_grid = np.array(grid)
-
+        n = len(grid)
+        row_counter = Counter(tuple(row) for row in grid)
+        # print(row_counter)
         nb_pairs = 0
-        for row in np_grid:
-            for col in np_grid.T:
-                if np.array_equal(row, col):
-                    nb_pairs += 1
-
+        for c in range(n):
+            col_tuple: Tuple[int] = tuple(grid[r][c] for r in range(n))
+            # print(col_tuple)
+            nb_pairs += row_counter[col_tuple]
         return nb_pairs
 
 
