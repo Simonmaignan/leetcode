@@ -3,7 +3,7 @@
 #
 # [2130] Maximum Twin Sum of a Linked List
 #
-from typing import Optional
+from typing import List, Optional
 
 
 class ListNode:
@@ -20,27 +20,15 @@ class ListNode:
 #         self.next = next
 class Solution:
     def pairSum(self, head: Optional[ListNode]) -> int:
-        dummy_node = ListNode()
-        cur_node = head
-        n = 0
-        while cur_node:
-            n += 1
-            next_node: ListNode = cur_node.next
-            cur_node.next = dummy_node.next
-            dummy_node.next = cur_node
-            cur_node = next_node
-
-        cur_node = head
-        cur_reversed_node = dummy_node.next
-        print(cur_node)
-        print(cur_reversed_node)
+        linked_list: List[int] = []
+        while head:
+            linked_list.append(head.val)
+            head = head.next
         max_twin_sum = 0
-        for _ in range(n // 2 + 1):
+        for i in range(len(linked_list) // 2 + 1):
             max_twin_sum = max(
-                max_twin_sum, cur_node.val + cur_reversed_node.val
+                max_twin_sum, linked_list[i] + linked_list[-(i + 1)]
             )
-            cur_node = cur_node.next
-            cur_reversed_node = cur_reversed_node.next
 
         return max_twin_sum
 
