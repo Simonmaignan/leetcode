@@ -7,35 +7,26 @@ from typing import List
 
 
 # @lc code=start
+import heapq
+
+
 class Solution:
     def maxScore(self, nums1: List[int], nums2: List[int], k: int) -> int:
-        n = len(nums1)
+        nums = sorted(zip(nums1, nums2), reverse=True, key=lambda x: x[1])
 
-        def dfs(
-            cur_i: int, k_left: int, sum1: int, min2: int, max_score: int
-        ) -> int:
-            # print(
-            #     f"cur_i={cur_i}; k_left={k_left}; sum1={sum1}; min2={min2}; max_score={max_score}"
-            # )
-            if (cur_i + k_left) > n:
-                return max_score
-            if k_left == 0:
-                return max(max_score, sum1 * min2)
+        nums1_heap: List[int] = []
+        sum_nums1 = 0
+        max_score = 0
+        for num1, min_nums2 in nums:
+            heapq.heappush(nums1_heap, num1)
+            sum_nums1 += num1
+            if len(nums1_heap) > k:
+                min_num1 = heapq.heappop(nums1_heap)
+                sum_nums1 -= min_num1
+            if len(nums1_heap) == k:
+                max_score = max(max_score, sum_nums1 * min_nums2)
 
-            # Use cur_i
-            max_score = dfs(
-                cur_i + 1,
-                k_left - 1,
-                sum1 + nums1[cur_i],
-                min(min2, nums2[cur_i]),
-                max_score,
-            )
-            # Do not use cur_i
-            max_score = dfs(cur_i + 1, k_left, sum1, min2, max_score)
-
-            return max_score
-
-        return dfs(0, k, 0, 10**5, 0)
+        return max_score
 
 
 # @lc code=end
