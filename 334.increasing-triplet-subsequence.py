@@ -4,33 +4,21 @@
 # [334] Increasing Triplet Subsequence
 #
 from typing import List
+from math import inf
 
 
 # @lc code=start
 class Solution:
     def increasingTriplet(self, nums: List[int]) -> bool:
-        n = len(nums)
-        i = 0
-        j = 1
-        k = 2
-        while k != n - 1 and j != n - 2 and i != n - 3:
-            print(f"i={i}; j={j}; k={k}")
-            if nums[i] < nums[j] < nums[k]:
+        min_num = mid_num = inf
+        for num in nums:
+            print(f"num={num}; min_num={min_num}; mid_num={mid_num}")
+            if num < min_num:
+                min_num = num
+            elif min_num < num < mid_num:
+                mid_num = num
+            elif num > mid_num:
                 return True
-            if nums[i] > nums[j]:
-                if nums[i + 1] > nums[i]:
-                    i += 1
-                else:
-                    j += 1
-            elif nums[j] > nums[k]:
-                if nums[j + 1] > nums[j]:
-                    j += 1
-                else:
-                    k += 1
-            while j <= i:
-                j += 1
-            while k <= j:
-                k += 1
 
         return False
 
