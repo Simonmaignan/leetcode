@@ -4,32 +4,28 @@
 # [714] Best Time to Buy and Sell Stock with Transaction Fee
 #
 from typing import List
+from math import inf
 
 
 # @lc code=start
 class Solution:
     def maxProfit(self, prices: List[int], fee: int) -> int:
         n = len(prices)
-        max_profit = 0
-        dp: List[int] = [0] * n
-        prev_max_profit = 0
-        for buy_day, buy_price in enumerate(prices):
-            # print(f"buy_day={buy_day}; buy_price={buy_price}")
-            if buy_day >= 1:
-                prev_max_profit = max(prev_max_profit, dp[buy_day - 1])
-            # print(f"prev_max_profit={prev_max_profit}")
-            for sell_day in range(buy_day + 1, n):
-                # print(f"sell_day={buy_day}; sell_price={prices[sell_day]}")
-                dp[sell_day] = max(
-                    dp[sell_day],
-                    prices[sell_day] - buy_price - fee + prev_max_profit,
-                )
-                max_profit = max(max_profit, dp[sell_day])
-                # print(dp)
-
+        # dp is my max profit for n days with or without any share bought
+        dp: List[List[int]] = [[0] * 2 for _ in range(n + 1)]
+        dp[0][1] = -inf
+        for day, price in enumerate(prices):
+            # I have bought a share meaning
+            # I buy, the one from today with my max profit from yesterday
+            # or I keep the one I bought before yesterday)
+            dp[day + 1][1] = max(dp[day][1], dp[day][0] - price)
+            # I don't have any share meaning
+            # I keep my profit from yesterday
+            # or I sell the share I had before yesterday)
+            dp[day + 1][0] = max(dp[day][0], dp[day][1] + price - fee)
         # print(dp)
 
-        return max_profit
+        return max(dp[-1][0], dp[-1][1])
 
 
 # @lc code=end
