@@ -24,32 +24,26 @@ class Solution:
     def deleteNode(
         self, root: Optional[TreeNode], key: int
     ) -> Optional[TreeNode]:
-        def dfs(node: Optional[TreeNode]) -> None:
-            if not node:
-                return
-            if node.val == key:
-                _del_node(node)
+        if not root:
+            return
 
-            elif node.val < key:
-                dfs(node.right)
-            else:
-                dfs(node.left)
+        if root.val < key:
+            root.right = self.deleteNode(root.right, key)
+            return root
+        elif root.val > key:
+            root.left = self.deleteNode(root.left, key)
+            return root
 
-        def _del_node(node: TreeNode) -> None:
-            if not node.left and not node.right:
-                node = None
-                return
-            if not node.left or not node.right:
-                node = node.left if node.left else node.right
-                return
-            # Both node.left and node.right
-            in_order_successor: TreeNode = node.right
-            while in_order_successor.left:
-                in_order_successor = in_order_successor.left
-            node.val = in_order_successor.val
-            in_order_successor = None
+        if not root.left or not root.right:
+            root = root.left if root.left else root.right
+            return root
+        # Both node.left and node.right
+        in_order_successor: TreeNode = root.right
+        while in_order_successor.left:
+            in_order_successor = in_order_successor.left
+        root.val = in_order_successor.val
+        root.right = self.deleteNode(root.right, in_order_successor.val)
 
-        dfs(root)
         return root
 
 
