@@ -8,14 +8,13 @@
 # @lc code=start
 class Solution:
     def isPalindrome(self, x: int) -> bool:
-        x_str: str = str(x)
-        left, right = 0, len(x_str) - 1
-        while left < right:
-            if x_str[left] != x_str[right]:
-                return False
-            left += 1
-            right -= 1
-        return True
+        if x < 0 or (x and x % 10 == 0):
+            return False
+        y = 0
+        while x > y:
+            y = y * 10 + x % 10
+            x //= 10
+        return x in (y, y // 10)
 
 
 # @lc code=end
