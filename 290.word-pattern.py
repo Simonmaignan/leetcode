@@ -17,15 +17,12 @@ class Solution:
         for char, word in zip(pattern, s_list):
             # print(f"char={char}, word={word}")
             # print(f"pattern_dict={pattern_dict}, s_dict={s_dict}")
-            if char not in pattern_dict:
-                if word in s_dict:
-                    return False
-                pattern_dict[char] = word
-            elif pattern_dict[char] != word:
+            if (char in pattern_dict and pattern_dict[char] != word) or (
+                word in s_dict and s_dict[word] != char
+            ):
                 return False
-            if word not in s_dict:
-                s_dict[word] = char
-
+            pattern_dict[char] = word
+            s_dict[word] = char
         return True
 
 
