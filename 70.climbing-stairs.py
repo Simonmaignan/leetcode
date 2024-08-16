@@ -3,40 +3,17 @@
 #
 # [70] Climbing Stairs
 #
-from typing import List
 
 
 # @lc code=start
 class Solution:
-    def climbStairs_(self, n: int) -> int:
-        dp: List[int] = [-1] * n
-
-        def dfs(remaining_steps) -> int:
-            # print(f"remaining_steps={remaining_steps}")
-            if remaining_steps == 0:
-                return 1
-            if dp[remaining_steps - 1] >= 0:
-                return dp[remaining_steps - 1]
-
-            nb_ways = 0
-            for step in [1, 2]:
-                # print(f"remaining_steps={remaining_steps}; step={step}")
-                if step > remaining_steps:
-                    continue
-                nb_ways += dfs(remaining_steps - step)
-            dp[remaining_steps - 1] = nb_ways
-            # print(f"dp={dp}")
-            return nb_ways
-
-        return dfs(n)
-
     def climbStairs(self, n: int) -> int:
-        dp: List[int] = [1] * (n + 1)
+        prev_step, cur_step = 1, 1
 
-        for i in range(2, n + 1):
-            dp[i] = dp[i - 2] + dp[i - 1]
+        for _ in range(2, n + 1):
+            prev_step, cur_step = cur_step, prev_step + cur_step
 
-        return dp[-1]
+        return cur_step
 
 
 # @lc code=end
