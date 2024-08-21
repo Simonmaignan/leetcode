@@ -3,7 +3,7 @@
 #
 # [530] Minimum Absolute Difference in BST
 #
-from typing import List, Optional
+from typing import Optional
 
 
 class TreeNode:
@@ -22,21 +22,20 @@ class TreeNode:
 #         self.right = right
 class Solution:
     def getMinimumDifference(self, root: Optional[TreeNode]) -> int:
-        val_list: List[int] = []
+        self.prev_val = float("-inf")
+        self.min_diff = float("inf")
 
         def dfs(node: Optional[TreeNode]) -> None:
             if not node:
                 return
 
             dfs(node.left)
-            val_list.append(node.val)
+            self.min_diff = min(self.min_diff, node.val - self.prev_val)
+            self.prev_val = node.val
             dfs(node.right)
 
         dfs(root)
-        min_diff = float("inf")
-        for i in range(1, len(val_list)):
-            min_diff = min(min_diff, abs(val_list[i] - val_list[i - 1]))
-        return min_diff
+        return self.min_diff
 
 
 # @lc code=end
