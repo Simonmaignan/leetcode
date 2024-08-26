@@ -2,10 +2,13 @@
 # Playing Card
 # https://algo.monster/problems/oop_playing_cards
 from abc import ABC, abstractmethod
+from math import inf
 from typing import Dict, List
 
 
 class Card(ABC):
+    """An abstract class representing a card with its value"""
+
     @property
     @abstractmethod
     def value(self) -> int:
@@ -28,6 +31,7 @@ class PlayingCard(Card):
     }
 
     def __init__(self, suit: str, value: str) -> None:
+        super().__init__()
         self.__suit: str = suit
         self.__value: str = value
 
@@ -52,6 +56,26 @@ class PlayingCard(Card):
         return self.suit == other.suit and self.value == other.value
 
 
+class JokerCard(Card):
+    """A sub class of Card representing a playing card with its suit and value"""
+
+    def __init__(self, color: str) -> None:
+        super().__init__()
+        self.__color: str = color
+
+    @property
+    def value(self) -> int:
+        """A property representing the card value"""
+        return inf
+
+    def __str__(self) -> str:
+        return f"{self.__color} Joker"
+
+    def __hash__(self) -> str:
+        # necessary for instances to behave sanely in dicts and sets.
+        return hash((self.__color, "Joker"))
+
+
 class Game:
     def __init__(self) -> None:
         self.card_deck: List[PlayingCard] = []
@@ -71,7 +95,7 @@ class Game:
         Args:
             color: the joker card color
         """
-        pass
+        self.card_deck.append(JokerCard(color=color))
 
     def card_string(self, card: int) -> str:
         """Returns the string representation of the card represented by card
