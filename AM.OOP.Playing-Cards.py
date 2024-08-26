@@ -76,9 +76,36 @@ class JokerCard(Card):
         return hash((self.__color, "Joker"))
 
 
+class Hand:
+    """A Class representing a hand of cards"""
+
+    def __init__(self, cards_list: List[Card]) -> None:
+        self.__cards_list: List[Card] = cards_list
+
+    @property
+    def sorted_cards(self) -> List[Card]:
+        """Returns the sorted list of cards in the Hand"""
+        return sorted(self.__cards_list)
+
+    def __str__(self) -> str:
+        return ", ".join([str(card) for card in self.__cards_list])
+
+    def __lt__(self, other: "Hand") -> bool:
+        for self_card, other_card in zip(
+            self.sorted_cards, other.sorted_cards
+        ):
+            if self_card > other_card:
+                return True
+            elif other_card > self_card:
+                return False
+
+        return False
+
+
 class Game:
     def __init__(self) -> None:
-        self.card_deck: List[PlayingCard] = []
+        self.card_deck: List[Card] = []
+        self.hands: List[Hand] = []
 
     def add_card(self, suit: str, value: str) -> None:
         """Create a new card object and add it to the Game card deck
@@ -116,6 +143,34 @@ class Game:
             True if card_a beats card_b, False otherwise
         """
         return self.card_deck[card_a] > self.card_deck[card_b]
+
+    def add_hand(self, card_indices: List[int]) -> None:
+        """Create a new Hand with cards represented by the list of integer representation of cards card_indices.
+
+        Args:
+            indices: a list of Card indices that are contained in the new Hand
+        """
+        cards_list: List[Card] = [self.card_deck[i] for i in card_indices]
+        self.hands.append(Hand(cards_list=cards_list))
+
+    def hand_string(self, hand: int) -> str:
+        """Return the string representation of the hand represented by hand.
+
+        Args:
+            hand: the index of the hand
+        """
+        return str(self.hands[hand])
+
+    def hand_beats(self, hand_a: int, hand_b: int) -> bool:
+        """Check if the hand represented by hand_a beats the hand represented by hand_b.
+
+        Args
+            hand_a: the index of a hand in hands
+            hand_b: the index of a hand in hands
+
+        Returns
+            True if hand_a beats hand_b, False otherwise"""
+        return self.hands[hand_a] > self.hands[hand_b]
 
 
 if __name__ == "__main__":
