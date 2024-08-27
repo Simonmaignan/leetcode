@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict, List, Optional
 
 
-class CarSize(Enum):
+class Size(Enum):
     """Enum class representing the car sizes"""
 
     SMALL = 1
@@ -13,30 +13,39 @@ class CarSize(Enum):
     LARGE = 3
 
 
+SIZES: Dict[str, Size] = {
+    "Small": Size.SMALL,
+    "Medium": Size.MEDIUM,
+    "Large": Size.LARGE,
+}
+SIZES_NAMES: Dict[Size, str] = {e: s for s, e in SIZES.items()}
+
+
 class Car:
     """Class representing a Car"""
 
-    CAR_SIZES: Dict[str, CarSize] = {
-        "Small": CarSize.SMALL,
-        "Medium": CarSize.MEDIUM,
-        "Large": CarSize.LARGE,
-    }
-    CAR_SIZES_NAMES: Dict[CarSize, str] = {e: s for s, e in CAR_SIZES.items()}
-
     def __init__(self, size: str, color: str, brand: str) -> None:
-        self.__size: CarSize = self.CAR_SIZES[size]
+        self.__size: Size = SIZES[size]
         self.__color: str = color
         self.__brand: str = brand
 
+    @property
+    def size(self) -> Size:
+        """Property to access the car size"""
+        return self.__size
+
     def __str__(self) -> str:
-        return f"{self.CAR_SIZES_NAMES[self.__size]} {self.__color} {self.__brand}"
+        return f"{SIZES_NAMES[self.__size]} {self.__color} {self.__brand}"
 
 
 class ParkingSpot:
     """Class representing a Parking Spot inside a Parking Lot"""
 
-    def __init__(self, parked_car: Optional[Car] = None) -> None:
+    def __init__(
+        self, spot_size: Size, parked_car: Optional[Car] = None
+    ) -> None:
         self.__parked_car: Optional[Car] = parked_car
+        self.__spot_size: Size = SIZES[spot_size]
 
     @property
     def is_free(self) -> bool:
@@ -49,9 +58,13 @@ class ParkingSpot:
         else:
             return str(self.__parked_car)
 
-    def park(self, car: Car) -> None:
+    def park(self, car: Car) -> bool:
         """Method to park a Car in the Parking Spot"""
-        self.__parked_car = car
+        # Parking spot is free and car size is equal or smaller than spot size
+        if self.is_free and self.__spot_size.value >= car.size.value:
+            self.__parked_car = car
+            return True
+        return False
 
     def leave(self) -> None:
         """Method to remove the car from the Parking Spot"""
@@ -61,16 +74,16 @@ class ParkingSpot:
 class ParkingLot:
     """Class representing a Parking Lot"""
 
-    def __init__(self, nb_spots: int) -> None:
+    def __init__(self, spots_size: List[str]) -> None:
         """Init method
 
         Args:
-            n: the number of ParkingSpot inside the ParkingLot
+            spots_size: a list of ParkingSpot size inside the ParkingLot
         """
-        self.__spots_list: List[ParkingSpot] = [
-            ParkingSpot() for _ in range(nb_spots)
-        ]
-        self.__nb_free_spots: int = nb_spots
+        self.__spots_list: List[ParkingSpot] = []
+        for spot_size in spots_size:
+            self.__spots_list.append(ParkingSpot(spot_size))
+        self.__nb_free_spots: int = len(self)
 
     @property
     def nb_free_spots(self) -> int:
@@ -106,9 +119,8 @@ class ParkingLot:
             parking_spot: ParkingSpot = self.__spots_list[
                 (spot_index + i) % len(self)
             ]
-            if parking_spot.is_free:
+            if parking_spot.park(car):
                 # print(f"ParkingSpot {i} is free")
-                parking_spot.park(car)
                 self.__nb_free_spots -= 1
                 break
 
@@ -120,9 +132,11 @@ class ParkingLot:
         self.__spots_list[spot_index].leave()
 
 
-def parking_system(n: int, instructions: List[List[str]]) -> List[str]:
+def parking_system(
+    spots: List[str], instructions: List[List[str]]
+) -> List[str]:
     """Entry point function for the parking system"""
-    parking_lot = ParkingLot(nb_spots=n)
+    parking_lot = ParkingLot(spots_size=spots)
     output: List[str] = []
     for instruction in instructions:
         # print(parking_lot.degug_msg())
