@@ -4,7 +4,7 @@ Playing Card
 https://algo.monster/problems/oop_public_library
 """
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Dict, List, Set
 
 
@@ -15,6 +15,7 @@ class Book(ABC):
         super().__init__()
         self.__id: str = book_id
         self.__title: str = title
+        self.__borrower_name: str = ""
 
     @property
     def title(self) -> str:
@@ -26,8 +27,34 @@ class Book(ABC):
         """Property to access the book id"""
         return self.__id
 
+    @property
+    def borrower_name(self) -> str:
+        """Property to return the borrower name"""
+        return self.__borrower_name
+
+    @property
+    def is_borrowed(self) -> bool:
+        """Property to if the book is borrowed"""
+        return bool(self.__borrower_name)
+
     def __str__(self) -> str:
-        return f'"{self.__title}"'
+        msg = f'"{self.__title}" {self._str_specific()}\nID: {self.__id}'
+        if self.is_borrowed:
+            msg += f"\nBorrowed by: {self.__borrower_name}"
+        return msg
+
+    @abstractmethod
+    def _str_specific(self) -> str:
+        """Return the str specific part of the Book"""
+        raise NotImplementedError
+
+    def borrow(self, borrower_name: str) -> None:
+        """Method to borrow the book"""
+        self.__borrower_name = borrower_name
+
+    def release(self) -> None:
+        """Method to release/return the book"""
+        self.__borrower_name = ""
 
 
 class TraditionalBook(Book):
@@ -42,8 +69,9 @@ class TraditionalBook(Book):
         """Property to access the author"""
         return self.__author
 
-    def __str__(self) -> str:
-        return f"{super().__str__()} by {self.__author}"
+    def _str_specific(self) -> str:
+        """Return the str specific part of the TraditionalBook"""
+        return f"by {self.__author}"
 
 
 class Magazine(Book):
@@ -53,8 +81,9 @@ class Magazine(Book):
         super().__init__(magazine_id, title)
         self.__issue_nb: str = issue_nb
 
-    def __str__(self) -> str:
-        return f"{super().__str__()} Issue {self.__issue_nb}"
+    def _str_specific(self) -> str:
+        """Return the str specific part of the TraditionalBook"""
+        return f"Issue {self.__issue_nb}"
 
 
 class Library:
@@ -64,6 +93,7 @@ class Library:
         self.__books_shelf: Dict[str, Book] = {}
         self.__titles_index: Dict[str, Set[str]] = {}
         self.__authors_index: Dict[str, Set[str]] = {}
+        self.__borrowers: Dict[str, str] = {}
 
     def register_book(self, book: Book) -> bool:
         """Method to register a book in the library"""
@@ -91,8 +121,7 @@ class Library:
         """Lookup a book id and return its representation."""
         if book_id not in self.__books_shelf:
             return "No such book exists"
-        book: Book = self.__books_shelf[book_id]
-        return f"{str(book)}\nID: {book_id}"
+        return str(self.__books_shelf[book_id])
 
     def lookup_title(self, book_title: str) -> str:
         """Lookup books by their title."""
@@ -102,7 +131,13 @@ class Library:
         if len(self.__titles_index[book_title]) == 1:
             return self.lookup_id(next(iter(self.__titles_index[book_title])))
 
-        return f"{len(self.__titles_index[book_title])} books match the title: {book_title}"
+        msg = f"{len(self.__titles_index[book_title])} books match the title: {book_title}"
+        nb_available_books = len(self.__titles_index[book_title])
+        for book_id in self.__titles_index[book_title]:
+            if self.__books_shelf[book_id].is_borrowed:
+                nb_available_books -= 1
+        msg += f"\n{nb_available_books} book(s) available"
+        return msg
 
     def lookup_author(self, book_author: str) -> str:
         """Lookup books by their author."""
@@ -114,7 +149,38 @@ class Library:
                 next(iter(self.__authors_index[book_author]))
             )
 
-        return f"{len(self.__authors_index[book_author])} books match the author: {book_author}"
+        msg = f"{len(self.__authors_index[book_author])} books match the author: {book_author}"
+        nb_available_books = len(self.__authors_index[book_author])
+        for book_id in self.__authors_index[book_author]:
+            if self.__books_shelf[book_id].is_borrowed:
+                nb_available_books -= 1
+        msg += f"\n{nb_available_books} book(s) available"
+
+        return msg
+
+    def borrow_book(self, book_id: str, borrower_name: str) -> bool:
+        """Method to borrow a book"""
+        if (
+            book_id not in self.__books_shelf
+            or borrower_name in self.__borrowers
+            or self.__books_shelf[book_id].is_borrowed
+        ):
+            return False
+
+        self.__books_shelf[book_id].borrow(borrower_name)
+        self.__borrowers[borrower_name] = book_id
+        return True
+
+    def return_book(self, borrower_name: str) -> bool:
+        """Method to borrow a book"""
+        if borrower_name not in self.__borrowers:
+            return False
+
+        book_id: str = self.__borrowers[borrower_name]
+        if book_id in self.__books_shelf:
+            self.__books_shelf[book_id].release()
+
+        self.__borrowers.pop(borrower_name, None)
 
 
 def parse_register_command(instruction: str) -> Book:
@@ -163,6 +229,15 @@ def simulate_library(instructions: List[str]) -> List[str]:
             elif sub_command == "author":
                 book_author: str = " ".join(inst_params[2:])
                 output.append(library.lookup_author(book_author))
+        elif command == "borrow":
+            book_id: str = inst_params[2]
+            borrower_name: str = " ".join(inst_params[2:])
+            library.borrow_book(book_id=book_id, borrower_name=borrower_name)
+        elif command == "return":
+            borrower_name: str = " ".join(inst_params[1:])
+            library.return_book(borrower_name)
+        else:
+            raise ValueError(f"f{command} is not a valid command")
     return output
 
 
