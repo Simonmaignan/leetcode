@@ -13,9 +13,18 @@ class Solution:
         Do not return anything, modify nums in-place instead.
         """
         n = len(nums)
-        nums_copy: List[int] = nums[:]
-        for i in range(n):
-            nums[i] = nums_copy[(n - k + i) % n]
+        k %= n
+        # Reverse nums
+        for i in range(n // 2):
+            nums[i], nums[-i - 1] = nums[-i - 1], nums[i]
+
+        # Reverse k first elements
+        for i in range(k // 2):
+            nums[i], nums[k - i - 1] = nums[k - i - 1], nums[i]
+
+        # Reverse n-k last elements
+        for i in range((n - k) // 2):
+            nums[k + i], nums[-i - 1] = nums[-i - 1], nums[k + i]
 
 
 # @lc code=end
