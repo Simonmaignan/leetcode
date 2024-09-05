@@ -30,26 +30,20 @@ class Solution:
             n += 1
             cur = cur.next
         k %= n
-        print(f"k={k}; n={n}")
+        # print(f"k={k}; n={n}")
         if k == 0:
             return head
-        i = 0
-        cur = head
-        dummy = ListNode()
-        dummy.next = head
-        prev = dummy
-        while cur.next:
-            if i < (n - k):
-                prev = prev.next
-            elif i == n - k:
-                prev.next = None
-                head = cur
-            i += 1
-            cur = cur.next
-        if k == 1:
-            prev.next = None
-            head = cur
-        cur.next = dummy.next
+
+        slow = fast = head
+        for _ in range(k):
+            fast = fast.next
+        while fast.next:
+            fast = fast.next
+            slow = slow.next
+        fast.next = head
+        head = slow.next
+        slow.next = None
+
         return head
 
 
