@@ -1,0 +1,14 @@
+-- https://leetcode.com/problems/list-the-products-ordered-in-a-period
+WITH february_2020_orders AS(
+    SELECT product_id, unit
+    FROM Orders
+    WHERE order_date BETWEEN '2020/02/01' and '2020/02/29'
+)
+SELECT 
+    p.product_name,
+    sum(o.unit) AS unit
+FROM february_2020_orders AS o
+JOIN Products AS p 
+ON o.product_id = p.product_id
+GROUP BY p.product_name
+HAVING sum(o.unit) >= 100
