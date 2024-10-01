@@ -1,0 +1,9 @@
+-- 196.delete-duplicate-emails.py
+-- SELECT 
+--     min(id) as id,
+--     email
+-- FROM Person
+-- GROUP BY email
+DELETE FROM Person
+WHERE id NOT IN
+(SELECT MIN(id) FROM Person GROUP BY EMAIL)
