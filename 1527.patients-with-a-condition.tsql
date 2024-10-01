@@ -1,0 +1,5 @@
+-- 1527.patients-with-a-condition.py
+SELECT *
+FROM Patients
+WHERE conditions LIKE '% DIAB1%' OR conditions LIKE 'DIAB1%'
+-- WHERE 'DIAB1' IN (SELECT value FROM STRING_SPLIT(conditions, ' '))

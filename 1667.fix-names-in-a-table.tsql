@@ -1,4 +1,4 @@
--- 1667.fix-names-in-a-table.py
+-- https://leetcode.com/problems/fix-names-in-a-table
 SELECT
     user_id,
     CONCAT(
@@ -6,3 +6,4 @@ SELECT
         LOWER(SUBSTRING(name, 2, LEN(name)))
     ) AS name
 FROM Users
+ORDER BY user_id
