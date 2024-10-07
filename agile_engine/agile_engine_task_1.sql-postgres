@@ -1,0 +1,41 @@
+-- Table with the total talking time of each callers
+WITH caller_duration as 
+(
+    SELECT 
+        caller as talker,
+        SUM(duration) as duration
+    FROM calls
+    GROUP BY caller
+),
+-- Table with the total talking time of each callees
+callee_duration as 
+(
+    SELECT 
+        callee as talker,
+        SUM(duration) as duration
+    FROM calls
+    GROUP BY callee
+),
+-- Union of 2 previous tables
+total_calls_duration as
+(
+    SELECT * FROM caller_duration
+    UNION
+    SELECT * FROM callee_duration
+),
+-- Table with the total talking time of all callers and callees
+total_talk_duration as
+(
+    SELECT
+        talker,
+        SUM(duration) as duration
+    FROM total_calls_duration
+    GROUP BY talker
+)
+SELECT name
+FROM total_talk_duration t
+JOIN phones p
+ON t.talker = p.phone_number
+WHERE duration >= 10
+ORDER BY name
+;
